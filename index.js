@@ -12,13 +12,14 @@ function initializeDiscord(clientId, clientSecret) {
 
   // const clientId = "1209211597017452594"; // <-- kkerti demo client id
   // const clientSecret = "dD9P92Hcj_9TgrPdChi700fXRIrvho15" // <-- kkerti demo secret
-  const redirectUri = ""
+  const redirect_uri = ""
 
   const scopes = ["rpc", "rpc.voice.read", "rpc.voice.write"];
 
   client = new Client({
     clientId,
-    clientSecret
+    clientSecret,
+    redirect_uri
   });
 
   client.login({ scopes })
