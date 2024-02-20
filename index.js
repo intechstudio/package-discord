@@ -9,26 +9,41 @@ const DiscordRPC = require("discord-rpc");
 const client = new DiscordRPC.Client({ transport: 'ipc' });
 
 function initializeDiscord(clientId, clientSecret) {
+
   // const clientId = "1209211597017452594"; // <-- kkerti demo client id
   // const clientSecret = "dD9P92Hcj_9TgrPdChi700fXRIrvho15" // <-- kkerti demo secret
   const redirectUri = ""
 
-  DiscordRPC.register(clientId);
 
   const scopes = ["rpc", "rpc.voice.read", "rpc.voice.write"];
 
   client.login({ clientId, clientSecret, redirectUri, scopes })
     .then(async () => {
+      DiscordRPC.register(clientId);
+
       const settings = await client.getVoiceSettings()
-      messagePorts.forEach((port) =>
+      messagePorts.forEach((port) => {
         port.postMessage({
           type: "init",
           message: { mic: settings.input.volume, out: settings.output.volume },
         })
+        port.postMessage({
+          type: "echo",
+          message: "Discord connected",
+        })
+      }
 
       );
     })
-    .catch(console.error);
+    .catch(() => {
+      messagePorts.forEach((port) => {
+        port.postMessage({
+          type: "echo",
+          message: "Discord connection failed",
+        })
+      }
+      );
+    });
 
 }
 
