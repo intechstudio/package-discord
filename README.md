@@ -1,8 +1,6 @@
-# Sample Grid Editor package project
+# Discord Package
 
-This repository contains a sample project for the Grid Editor Package system. The project can be imported into the currently released Editor version.
-
-The package will show a text area and a button in the preferences window pane. The package will periodically send a message that is shown in the text area, and the button can also be used to print another message in the text area.
+This package is a POC for controlling the Discord client. In order to make it work, you have to create an app and copy the oath2 `clientId` and `clientSecret` values into the package. In this package right now the *input* and *output* are controlled.
 
 ## Overview
 
@@ -12,6 +10,8 @@ Packages for the Grid Editor generally consists of two parts:
 - A preferences panel window shown in the Preferences pane. The code for the preferences **must** be a single HTML page. This is run in the renderer process of the Electron application. The preferences panel can request a MessagePort to communicate with the NodeJS part of the package.
 
 ## Installation
+
+After this package is in the right folder, run `npm install` to download the necessary node modules.
 
 Packages are run from the `packages` folder of the Grid Editor user data folder (by default, found inside the 'Document' folder under `grid-userdata`). Each package can be found inside it's separate folder.
 
