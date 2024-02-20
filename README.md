@@ -21,3 +21,9 @@ When developing a package, changes can be seen depending on what is being modifi
 
 - For the NodeJS module, changes are **only** applied after the Editor is restarted.
 - Changes in the preferences window can be seen after a package disable-enable cycle.
+
+## Know-how
+
+This package is based on `discord-rpc` which seems to be abandoned. Consider changing to this version: https://www.npmjs.com/package/@xhayper/discord-rpc, includes snap support, probably better under linux?
+
+
