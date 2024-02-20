@@ -8,10 +8,10 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "discord-rpc": "^4.0.1"
-  },
   "grid_editor": {
     "preference": "preference.html"
+  },
+  "dependencies": {
+    "@xhayper/discord-rpc": "^1.1.2"
   }
 }

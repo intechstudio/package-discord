@@ -4,9 +4,9 @@ let isEnabled = false;
 let controller = undefined;
 let messagePorts = new Set();
 
-const DiscordRPC = require("discord-rpc");
+const { Client } = require("@xhayper/discord-rpc")
 
-const client = new DiscordRPC.Client({ transport: 'ipc' });
+let client;
 
 function initializeDiscord(clientId, clientSecret) {
 
@@ -14,14 +14,16 @@ function initializeDiscord(clientId, clientSecret) {
   // const clientSecret = "dD9P92Hcj_9TgrPdChi700fXRIrvho15" // <-- kkerti demo secret
   const redirectUri = ""
 
-
   const scopes = ["rpc", "rpc.voice.read", "rpc.voice.write"];
 
-  client.login({ clientId, clientSecret, redirectUri, scopes })
-    .then(async () => {
-      DiscordRPC.register(clientId);
+  client = new Client({
+    clientId,
+    clientSecret
+  });
 
-      const settings = await client.getVoiceSettings()
+  client.login({ scopes })
+    .then(async () => {
+      const settings = await client.user.getVoiceSettings()
       messagePorts.forEach((port) => {
         port.postMessage({
           type: "init",
@@ -35,11 +37,11 @@ function initializeDiscord(clientId, clientSecret) {
 
       );
     })
-    .catch(() => {
+    .catch((error) => {
       messagePorts.forEach((port) => {
         port.postMessage({
           type: "echo",
-          message: "Discord connection failed",
+          message: "Discord connection failed" + error,
         })
       }
       );
@@ -90,14 +92,14 @@ async function onMessage(port, data) {
     // vol must be between 0 and 100
     if (vol > 100) vol = 100;
     if (vol < 0) vol = 0;
-    client.setVoiceSettings({ input: { volume: vol } }).catch(console.info);
+    client.user.setVoiceSettings({ input: { volume: vol } }).catch(console.info);
   }
   if (data.type === "out_volume") {
     let vol = Number(data.volume)
     if (vol > 100) vol = 100;
     if (vol < 0) vol = 0;
     // vol must be between 0 and 100
-    client.setVoiceSettings({ output: { volume: vol } }).catch(console.info);
+    client.user.setVoiceSettings({ output: { volume: vol } }).catch(console.info);
   }
 }
 
