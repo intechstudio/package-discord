@@ -1,7 +1,7 @@
 {
-  "name": "discord",
+  "name": "package-discord",
   "version": "1.0.0",
-  "description": "Discord RPC Project",
+  "description": "Discord RPC",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

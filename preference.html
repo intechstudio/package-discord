@@ -6,25 +6,36 @@
     color: #000;
   }
 </style>
-<div class="p-4 bg-secondary rounded-lg flex flex-col mb-4">
+<div class="p-4 bg-secondary rounded-lg flex flex-col ">
   <div class="flex flex-col">
-    <div class="pb-2">Sample package console</div>
+    <div class="pb-2">Discord Control Demo</div>
 
-    <input class="text-black px-2 py-1" min=0 max=100 id="mic_volume" type="number" />
+    <div class="flex flex-col border border-yellow-500 p-2">
+      <a target="_blank" class="pb-2 text-blue-500 hover:text-white"
+        href="https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications%3Fnew_application%3Dtrue">Create
+        app</a>
+      <label for="client_id">Client ID</label>
+      <input class="my-1 text-white px-2 py-1 bg-primary focus:outline-none focus:ring-1" min=0 max=100 id="client_id"
+        type="text" />
+      <label for="client_secret">Client Secret</label>
+      <input class="my-1 text-white px-2 py-1 bg-primary focus:outline-none focus:ring-1" min=0 max=100
+        id="client_secret" type="password" />
+      <div>
+        <button id="auth_btn" class="mt-2 px-4 py-1 bg-commit">Authorize</button>
+      </div>
+    </div>
 
-    <button id="btn_send_mic_volume"
-      class="flex items-center justify-center rounded focus:outline-none border-2 border-select bg-select hover:bg-select-saturate-10 hover:border-select-saturate-10 text-white px-2 py-0.5 mr-2">
-      Set Mic Volume
-    </button>
+    <div class="py-2 flex flex-col">
+      <label for="mic_volume">Microphone volume</label>
+      <input class="my-1 text-white px-2 py-1 bg-primary focus:outline-none focus:ring-1" min=0 max=100 id="mic_volume"
+        type="number" />
 
-    <input class="text-black px-2 py-1" id="out_volume" min=0 max=100 type="number" />
+      <label for="out_volume">Output volume</label>
+      <input class="my-1 text-white px-2 py-1 bg-primary focus:outline-none focus:ring-1" min=0 max=100 id="out_volume"
+        type="number" />
 
-    <button id="btn_send_out_volume"
-      class="flex items-center justify-center rounded focus:outline-none border-2 border-select bg-select hover:bg-select-saturate-10 hover:border-select-saturate-10 text-white px-2 py-0.5 mr-2">
-      Set Out Volume
-    </button>
-
-    <textarea id="package_console"></textarea>
+      <textarea placeholder="logs..." class="my-2 outline-none p-1 bg-primary" id="package_console"></textarea>
+    </div>
 
   </div>
 </div>
@@ -32,13 +43,6 @@
   {
     const packageConsole = document.getElementById(
       "package_console"
-    );
-
-    const outVolumeButton = document.getElementById(
-      "btn_send_out_volume"
-    );
-    const micVolumeButton = document.getElementById(
-      "btn_send_mic_volume"
     );
 
     const micVolume = document.getElementById(
@@ -49,21 +53,38 @@
       "out_volume"
     );
 
+    const authButton = document.getElementById(
+      "auth_btn"
+    );
+
     const messagePort = createPackageMessagePort(
-      "discord"
+      "package-discord"
     );
 
     messagePort.onmessage = (e) => {
       const data = e.data;
-      packageConsole.value += data.message + "\r\n";
+      if (data.type === "init") {
+        micVolume.value = data.message.mic;
+        outVolume.value = data.message.out;
+      }
+      // NOT USED
+      if (data.type === "log") {
+        packageConsole.value += data.message + "\r\n";
+      }
     };
 
-    outVolumeButton.onclick = function () {
-      messagePort.postMessage({ type: "out_volume", volume: outVolume.value });
+    outVolume.onclick = function (event) {
+      messagePort.postMessage({ type: "out_volume", volume: event.target.value });
     };
 
-    micVolumeButton.onclick = function () {
-      messagePort.postMessage({ type: "mic_volume", volume: micVolume.value });
+    micVolume.onchange = function (event) {
+      messagePort.postMessage({ type: "mic_volume", volume: event.target.value });
+    };
+
+    authButton.onclick = function (event) {
+      const client_id = document.getElementById("client_id").value;
+      const client_secret = document.getElementById("client_secret").value;
+      messagePort.postMessage({ type: "auth_discord", clientId: client_id, clientSecret: client_secret });
     };
 
     messagePort.start();
