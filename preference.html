@@ -1,0 +1,71 @@
+<style>
+  textarea {
+    overflow-y: scroll;
+    height: 100px;
+    resize: none;
+    color: #000;
+  }
+</style>
+<div class="p-4 bg-secondary rounded-lg flex flex-col mb-4">
+  <div class="flex flex-col">
+    <div class="pb-2">Sample package console</div>
+
+    <input class="text-black px-2 py-1" min=0 max=100 id="mic_volume" type="number" />
+
+    <button id="btn_send_mic_volume"
+      class="flex items-center justify-center rounded focus:outline-none border-2 border-select bg-select hover:bg-select-saturate-10 hover:border-select-saturate-10 text-white px-2 py-0.5 mr-2">
+      Set Mic Volume
+    </button>
+
+    <input class="text-black px-2 py-1" id="out_volume" min=0 max=100 type="number" />
+
+    <button id="btn_send_out_volume"
+      class="flex items-center justify-center rounded focus:outline-none border-2 border-select bg-select hover:bg-select-saturate-10 hover:border-select-saturate-10 text-white px-2 py-0.5 mr-2">
+      Set Out Volume
+    </button>
+
+    <textarea id="package_console"></textarea>
+
+  </div>
+</div>
+<script>
+  {
+    const packageConsole = document.getElementById(
+      "package_console"
+    );
+
+    const outVolumeButton = document.getElementById(
+      "btn_send_out_volume"
+    );
+    const micVolumeButton = document.getElementById(
+      "btn_send_mic_volume"
+    );
+
+    const micVolume = document.getElementById(
+      "mic_volume"
+    );
+
+    const outVolume = document.getElementById(
+      "out_volume"
+    );
+
+    const messagePort = createPackageMessagePort(
+      "discord"
+    );
+
+    messagePort.onmessage = (e) => {
+      const data = e.data;
+      packageConsole.value += data.message + "\r\n";
+    };
+
+    outVolumeButton.onclick = function () {
+      messagePort.postMessage({ type: "out_volume", volume: outVolume.value });
+    };
+
+    micVolumeButton.onclick = function () {
+      messagePort.postMessage({ type: "mic_volume", volume: micVolume.value });
+    };
+
+    messagePort.start();
+  }
+</script>
