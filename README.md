@@ -1,8 +1,6 @@
-# Sample Grid Editor package project
+# Discord Package
 
-This repository contains a sample project for the Grid Editor Package system. The project can be imported into the currently released Editor version.
-
-The package will show a text area and a button in the preferences window pane. The package will periodically send a message that is shown in the text area, and the button can also be used to print another message in the text area.
+This package is a POC for controlling the Discord client. In order to make it work, you have to create an app and copy the oath2 `clientId` and `clientSecret` values into the package. In this package right now the *input* and *output* are controlled.
 
 ## Overview
 
@@ -13,6 +11,8 @@ Packages for the Grid Editor generally consists of two parts:
 
 ## Installation
 
+After this package is in the right folder, run `npm install` to download the necessary node modules.
+
 Packages are run from the `packages` folder of the Grid Editor user data folder (by default, found inside the 'Document' folder under `grid-userdata`). Each package can be found inside it's separate folder.
 
 The sample project repository can be directly cloned into the packages folder. The package should then be shown inside the packages list in the Preferences window pane.
@@ -21,3 +21,9 @@ When developing a package, changes can be seen depending on what is being modifi
 
 - For the NodeJS module, changes are **only** applied after the Editor is restarted.
 - Changes in the preferences window can be seen after a package disable-enable cycle.
+
+## Know-how
+
+This package is based on `discord-rpc` which seems to be abandoned. Consider changing to this version: https://www.npmjs.com/package/@xhayper/discord-rpc, includes snap support, probably better under linux?
+
+
