@@ -68,6 +68,11 @@
         micVolume.value = data.message.mic;
         outVolume.value = data.message.out;
       }
+      if (data.type === "clientInit"){
+        document.getElementById("client_id").value = data.message.clientId;
+        document.getElementById("client_secret").value = data.message.clientSecret;
+      
+      }
       if (data.type === "echo") {
         packageConsole.value += data.message + "\r\n";
       }
