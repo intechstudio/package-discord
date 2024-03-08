@@ -8,7 +8,7 @@ let client;
 let clientId;
 let clientSecret;
 
-function initializeDiscord(newClientId, newClientSecret) {
+function initializeDiscord(newClientId, newClientSecret, refreshToken = undefined) {
   const redirect_uri = ""
 
   const scopes = ["rpc", "rpc.voice.read", "rpc.voice.write"];
@@ -16,22 +16,22 @@ function initializeDiscord(newClientId, newClientSecret) {
 	clientId = newClientId;
 	clientSecret = newClientSecret
 
-  controller?.sendMessageToRuntime({
-	  id: "persist-data",
-	  data: {
-		  "client-id" : clientId,
-		  "client-secret" : clientSecret
-	  }
-  })
-
   client = new Client({
     clientId,
     clientSecret,
     redirect_uri
   });
   
-  client.login({ scopes })
+  client.login({ scopes, refreshToken })
     .then(async () => {
+      controller?.sendMessageToRuntime({
+        id: "persist-data",
+        data: {
+          "client-id" : clientId,
+          "client-secret" : clientSecret,
+          "refresh-token" : client.user.client.refreshToken,
+        }
+      })
       const settings = await client.user.getVoiceSettings()
       messagePorts.forEach((port) => {
         port.postMessage({
@@ -63,6 +63,10 @@ exports.loadPackage = async function (
   controller = gridController;
   clientId = persistedData?.["client-id"];
   clientSecret = persistedData?.["client-secret"];
+  let token = persistedData?.["refresh-token"];
+  if (token){
+    initializeDiscord(clientId, clientSecret, token)
+  }
   isEnabled = true;
 };
 

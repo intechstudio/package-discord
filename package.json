@@ -4,7 +4,8 @@
   "description": "Discord RPC",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "preference": "preference.html"
   },
   "dependencies": {
-    "@xhayper/discord-rpc": "^1.1.2"
+    "@xhayper/discord-rpc": "^1.1.2",
+    "patch-package": "^8.0.0"
   }
 }

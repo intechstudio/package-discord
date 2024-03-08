@@ -1,0 +1,18 @@
+diff --git a/node_modules/@xhayper/discord-rpc/dist/Client.js b/node_modules/@xhayper/discord-rpc/dist/Client.js
+index 22aff23..c412f11 100644
+--- a/node_modules/@xhayper/discord-rpc/dist/Client.js
++++ b/node_modules/@xhayper/discord-rpc/dist/Client.js
+@@ -264,7 +264,12 @@ class Client extends node_events_1.EventEmitter {
+             this.emit("ready");
+             return;
+         }
+-        await this.authorize(options);
++        if (options && options.refreshToken){
++            this.refreshToken = options.refreshToken;
++            await this.refreshAccessToken()
++        } else {
++            await this.authorize(options);
++        }
+         await this.authenticate();
+     }
+     /**
