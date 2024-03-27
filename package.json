@@ -1,6 +1,6 @@
 {
   "name": "package-discord",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Discord RPC",
   "main": "index.js",
   "scripts": {
