@@ -53,20 +53,12 @@
   {
     const packageConsole = document.getElementById("package_console");
 
-    const micVolume = document.getElementById("mic_volume");
-
-    const outVolume = document.getElementById("out_volume");
-
     const authButton = document.getElementById("auth_btn");
 
     const messagePort = createPackageMessagePort("package-discord");
 
     messagePort.onmessage = (e) => {
       const data = e.data;
-      if (data.type === "init") {
-        micVolume.value = data.message.mic;
-        outVolume.value = data.message.out;
-      }
       if (data.type === "clientInit") {
         document.getElementById("client_id").value = data.message.clientId;
         document.getElementById("client_secret").value =
@@ -75,20 +67,6 @@
       if (data.type === "echo") {
         packageConsole.value += data.message + "\r\n";
       }
-    };
-
-    outVolume.onclick = function (event) {
-      messagePort.postMessage({
-        type: "out_volume",
-        volume: event.target.value,
-      });
-    };
-
-    micVolume.onchange = function (event) {
-      messagePort.postMessage({
-        type: "mic_volume",
-        volume: event.target.value,
-      });
     };
 
     authButton.onclick = function (event) {

@@ -42,10 +42,6 @@ function initializeDiscord(
       const settings = await client.user.getVoiceSettings();
       messagePorts.forEach((port) => {
         port.postMessage({
-          type: "init",
-          message: { mic: settings.input.volume, out: settings.output.volume },
-        });
-        port.postMessage({
           type: "echo",
           message: "Discord connected",
         });
