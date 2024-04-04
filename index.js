@@ -1,9 +1,8 @@
 let isEnabled = false;
 let controller = undefined;
 let messagePorts = new Set();
-let fs = require("fs")
-let path = require("path")
-
+let fs = require("fs");
+let path = require("path");
 
 const { Client } = require("@xhayper/discord-rpc");
 
@@ -71,103 +70,118 @@ exports.loadPackage = async function (gridController, persistedData) {
     initializeDiscord(clientId, clientSecret, token);
   }
 
-  let discordIconSvg = fs.readFileSync(path.resolve(__dirname, 'discord-mark-white.svg'), {encoding: "utf-8"})
-  
-  let volumeActionHtml = fs.readFileSync(path.resolve(__dirname, 'volume_control_action.html'), {encoding: "utf-8"})
-  controller.sendMessageToRuntime({
-      id: "add-action",
-      info: {
-        actionId: 0,
-        short: "xdiscvc",
-        name: "Discord_VolumeControl",
-        displayName: "Volume Control",
-        rendering: "standard",
-        category: "discord",
-        blockTitle: "Volume Control",
-        defaultLua: 'gps("package-discord", "input", val)',
-        color: "#5865F2",
-        icon: discordIconSvg,
-        blockIcon: discordIconSvg,
-        selectable: true,
-        movable: true,
-        hideIcon: false,
-        type: "single",
-        toggleable: true,
-        actionHtml: volumeActionHtml,
-      },
-  })
+  let discordIconSvg = fs.readFileSync(
+    path.resolve(__dirname, "discord-mark-white.svg"),
+    { encoding: "utf-8" },
+  );
 
-  let voiceSetHtml = fs.readFileSync(path.resolve(__dirname, 'voice_set_action.html'), {encoding: "utf-8"})
+  let volumeActionHtml = fs.readFileSync(
+    path.resolve(__dirname, "volume_control_action.html"),
+    { encoding: "utf-8" },
+  );
   controller.sendMessageToRuntime({
-      id: "add-action",
-      info: {
-        actionId: 1,
-        short: "xdiscvs",
-        name: "Discord_VoiceSet",
-        displayName: "Voice Set",
-        rendering: "standard",
-        category: "discord",
-        blockTitle: "Voice Set",
-        defaultLua: 'gps("package-discord", "mute-set", val)',
-        color: "#5865F2",
-        icon: discordIconSvg,
-        blockIcon: discordIconSvg,
-        selectable: true,
-        movable: true,
-        hideIcon: false,
-        type: "single",
-        toggleable: true,
-        actionHtml: voiceSetHtml,
-      },
-  })
+    id: "add-action",
+    info: {
+      actionId: 0,
+      short: "xdiscvc",
+      name: "Discord_VolumeControl",
+      displayName: "Volume Control",
+      rendering: "standard",
+      category: "discord",
+      blockTitle: "Volume Control",
+      defaultLua: 'gps("package-discord", "input", val)',
+      color: "#5865F2",
+      icon: discordIconSvg,
+      blockIcon: discordIconSvg,
+      selectable: true,
+      movable: true,
+      hideIcon: false,
+      type: "single",
+      toggleable: true,
+      actionHtml: volumeActionHtml,
+    },
+  });
 
-  let voiceToggleHtml = fs.readFileSync(path.resolve(__dirname, 'voice_toggle_action.html'), {encoding: "utf-8"})
+  let voiceSetHtml = fs.readFileSync(
+    path.resolve(__dirname, "voice_set_action.html"),
+    { encoding: "utf-8" },
+  );
   controller.sendMessageToRuntime({
-      id: "add-action",
-      info: {
-        actionId: 2,
-        short: "xdiscvt",
-        name: "Discord_VoiceToggle",
-        displayName: "Voice Toggle",
-        rendering: "standard",
-        category: "discord",
-        blockTitle: "Voice Toggle",
-        defaultLua: 'gps("package-discord", "mute-toggle")',
-        color: "#5865F2",
-        icon: discordIconSvg,
-        blockIcon: discordIconSvg,
-        selectable: true,
-        movable: true,
-        hideIcon: false,
-        type: "single",
-        toggleable: true,
-        actionHtml: voiceToggleHtml,
-      },
-  })
+    id: "add-action",
+    info: {
+      actionId: 1,
+      short: "xdiscvs",
+      name: "Discord_VoiceSet",
+      displayName: "Voice Set",
+      rendering: "standard",
+      category: "discord",
+      blockTitle: "Voice Set",
+      defaultLua: 'gps("package-discord", "mute-set", val)',
+      color: "#5865F2",
+      icon: discordIconSvg,
+      blockIcon: discordIconSvg,
+      selectable: true,
+      movable: true,
+      hideIcon: false,
+      type: "single",
+      toggleable: true,
+      actionHtml: voiceSetHtml,
+    },
+  });
 
-  let selectChannelHtml = fs.readFileSync(path.resolve(__dirname, 'select_voice_channel_action.html'), {encoding: "utf-8"})
+  let voiceToggleHtml = fs.readFileSync(
+    path.resolve(__dirname, "voice_toggle_action.html"),
+    { encoding: "utf-8" },
+  );
   controller.sendMessageToRuntime({
-      id: "add-action",
-      info: {
-        actionId: 3,
-        short: "xdiscsc",
-        name: "Discord_ChannelSelect",
-        displayName: "Channel Select",
-        rendering: "standard",
-        category: "discord",
-        blockTitle: "Channel Select",
-        defaultLua: 'gps("package-discord", "select-channel", null, false)',
-        color: "#5865F2",
-        icon: discordIconSvg,
-        blockIcon: discordIconSvg,
-        selectable: true,
-        movable: true,
-        hideIcon: false,
-        type: "single",
-        toggleable: true,
-        actionHtml: selectChannelHtml,
-      },
-  })
+    id: "add-action",
+    info: {
+      actionId: 2,
+      short: "xdiscvt",
+      name: "Discord_VoiceToggle",
+      displayName: "Voice Toggle",
+      rendering: "standard",
+      category: "discord",
+      blockTitle: "Voice Toggle",
+      defaultLua: 'gps("package-discord", "mute-toggle")',
+      color: "#5865F2",
+      icon: discordIconSvg,
+      blockIcon: discordIconSvg,
+      selectable: true,
+      movable: true,
+      hideIcon: false,
+      type: "single",
+      toggleable: true,
+      actionHtml: voiceToggleHtml,
+    },
+  });
+
+  let selectChannelHtml = fs.readFileSync(
+    path.resolve(__dirname, "select_voice_channel_action.html"),
+    { encoding: "utf-8" },
+  );
+  controller.sendMessageToRuntime({
+    id: "add-action",
+    info: {
+      actionId: 3,
+      short: "xdiscsc",
+      name: "Discord_ChannelSelect",
+      displayName: "Channel Select",
+      rendering: "standard",
+      category: "discord",
+      blockTitle: "Channel Select",
+      defaultLua: 'gps("package-discord", "select-channel", null, false)',
+      color: "#5865F2",
+      icon: discordIconSvg,
+      blockIcon: discordIconSvg,
+      selectable: true,
+      movable: true,
+      hideIcon: false,
+      type: "single",
+      toggleable: true,
+      actionHtml: selectChannelHtml,
+    },
+  });
 
   isEnabled = true;
 };
@@ -220,9 +234,9 @@ exports.sendMessage = async function (args) {
   if (type === "input") {
     let vol = Number(args[1]);
     let transformedVol = 0;
-    if (vol < 0){
+    if (vol < 0) {
       transformedVol = 0;
-    } else if (vol >= 100){
+    } else if (vol >= 100) {
       transformedVol = 100;
     } else {
       transformedVol = Math.exp((vol - 19.966) / 17.369);
@@ -234,11 +248,11 @@ exports.sendMessage = async function (args) {
   if (type === "output") {
     let vol = Number(args[1]);
     let transformedVol = 0;
-    if (vol < 0){
+    if (vol < 0) {
       transformedVol = 0;
-    } else if (vol >= 200){
+    } else if (vol >= 200) {
       transformedVol = 200;
-    } else if (vol <= 100){
+    } else if (vol <= 100) {
       //Two different curves, switches at apprx. 100
       transformedVol = Math.exp((vol - 19.966) / 17.369);
     } else {
@@ -248,11 +262,13 @@ exports.sendMessage = async function (args) {
       .setVoiceSettings({ output: { volume: Math.min(transformedVol, 200) } })
       .catch(console.info);
   }
-  if (type.includes("mute") || type.includes("deafen")){
+  if (type.includes("mute") || type.includes("deafen")) {
     let newValue = false;
-    if (type.includes("toggle")){
-      let voiceSetting = await client.user.getVoiceSettings().catch(console.info);
-      if (type.includes("mute")){
+    if (type.includes("toggle")) {
+      let voiceSetting = await client.user
+        .getVoiceSettings()
+        .catch(console.info);
+      if (type.includes("mute")) {
         newValue = !voiceSetting.mute;
       } else {
         newValue = !voiceSetting.deaf;
@@ -261,17 +277,13 @@ exports.sendMessage = async function (args) {
       newValue = Boolean(args[1]);
     }
 
-    if (type.includes("mute")){
-      client.user
-        .setVoiceSettings({ mute: newValue })
-        .catch(console.info);
+    if (type.includes("mute")) {
+      client.user.setVoiceSettings({ mute: newValue }).catch(console.info);
     } else {
-      client.user
-        .setVoiceSettings({ deaf: newValue })
-        .catch(console.info);
+      client.user.setVoiceSettings({ deaf: newValue }).catch(console.info);
     }
   }
-  if (type === "select-channel"){
+  if (type === "select-channel") {
     let channelId = args[1];
     let force = Boolean(args[2]);
     client.user

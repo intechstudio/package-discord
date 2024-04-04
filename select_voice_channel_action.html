@@ -1,43 +1,53 @@
 <div class="flex items-center text-white">
-    Channel Id: <input class="flex flex-grow h-auto bg-primary focus:outline-none py-1 px-2 border border-transparent"/>
-    Force: <input type="checkbox"/>
+  Channel Id:
+  <input
+    class="flex flex-grow h-auto bg-primary focus:outline-none py-1 px-2 border border-transparent"
+  />
+  Force: <input type="checkbox" />
 </div>
 <script>
-{   
-    let input = document.currentScript.previousElementSibling.firstElementChild
+  {
+    let input = document.currentScript.previousElementSibling.firstElementChild;
     let checkbox = input.nextElementSibling;
-    function handleConfigUpdate(config){
-        const regex = /^gps\("package-discord", "select-channel", "*(.*?)"*, (.*?)\)$/;
+    function handleConfigUpdate(config) {
+      const regex =
+        /^gps\("package-discord", "select-channel", "*(.*?)"*, (.*?)\)$/;
 
-        const match = config.script.match(regex);
+      const match = config.script.match(regex);
 
-        if (match) {
-            const channelId = match[1];
-            const force = match[2];
-            if (channelId){
-                input.value = channelId;
-            } else {
-                input.value = "null"
-            }
-            checkbox.value = force;
+      if (match) {
+        const channelId = match[1];
+        const force = match[2];
+        if (channelId) {
+          input.value = channelId;
+        } else {
+          input.value = "null";
         }
+        checkbox.value = force;
+      }
     }
 
-    function updateActionCode(){
-        var channelId = input.value
-        if (channelId !== "null"){
-            channelId = `"${channelId}"`
-        }
-        var force = checkbox.value;
-        var code = `gps("package-discord", "select-channel", ${channelId}, ${force})`;
-        const event = new CustomEvent("updateCode", {bubbles: true, detail: {script: String(code)}})
-        input.dispatchEvent(event);
+    function updateActionCode() {
+      var channelId = input.value;
+      if (channelId !== "null") {
+        channelId = `"${channelId}"`;
+      }
+      var force = checkbox.value;
+      var code = `gps("package-discord", "select-channel", ${channelId}, ${force})`;
+      const event = new CustomEvent("updateCode", {
+        bubbles: true,
+        detail: { script: String(code) },
+      });
+      input.dispatchEvent(event);
     }
 
-    checkbox.addEventListener("change", updateActionCode, false)
-    input.addEventListener("change", updateActionCode, false)
+    checkbox.addEventListener("change", updateActionCode, false);
+    input.addEventListener("change", updateActionCode, false);
 
-    const event = new CustomEvent("updateConfigHandler", {bubbles: true, detail: {handler: handleConfigUpdate}})
-    input.dispatchEvent(event)
-}
+    const event = new CustomEvent("updateConfigHandler", {
+      bubbles: true,
+      detail: { handler: handleConfigUpdate },
+    });
+    input.dispatchEvent(event);
+  }
 </script>
