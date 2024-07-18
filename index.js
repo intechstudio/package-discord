@@ -31,15 +31,18 @@ function initializeDiscord(
   client
     .login({ scopes, refreshToken })
     .then(async () => {
-      controller?.sendMessageToRuntime({
-        id: "persist-data",
+      controller?.sendMessageToEditor({
+        type: "persist-data",
         data: {
           "client-id": clientId,
           "client-secret": clientSecret,
           "refresh-token": client.user.client.refreshToken,
         },
       });
+      client.on("VOICE_SETTINGS_UPDATE", handleVoiceSettingsChange);
+      client.subscribe("VOICE_SETTINGS_UPDATE");
       const settings = await client.user.getVoiceSettings();
+      handleVoiceSettingsChange(settings);
       messagePorts.forEach((port) => {
         port.postMessage({
           type: "echo",
@@ -57,6 +60,13 @@ function initializeDiscord(
     });
 }
 
+function handleVoiceSettingsChange(args) {
+  controller.sendMessageToEditor({
+    type: "execute-lua-script",
+    script: `<?lua --[[@g]] discord_mute,discord_deaf=${args.mute ? "1" : "0"},${args.deaf ? "1" : "0"} ?>`,
+  });
+}
+
 exports.loadPackage = async function (gridController, persistedData) {
   controller = gridController;
   clientId = persistedData?.["client-id"];
@@ -71,16 +81,11 @@ exports.loadPackage = async function (gridController, persistedData) {
     { encoding: "utf-8" },
   );
 
-  let volumeActionHtml = fs.readFileSync(
-    path.resolve(__dirname, "volume_control_action.html"),
-    { encoding: "utf-8" },
-  );
-  controller.sendMessageToRuntime({
-    id: "add-action",
+  controller.sendMessageToEditor({
+    type: "add-action",
     info: {
       actionId: 0,
       short: "xdiscvc",
-      name: "Discord_VolumeControl",
       displayName: "Volume Control",
       rendering: "standard",
       category: "discord",
@@ -94,20 +99,15 @@ exports.loadPackage = async function (gridController, persistedData) {
       hideIcon: false,
       type: "single",
       toggleable: true,
-      actionHtml: volumeActionHtml,
+      actionComponent: "volume-control-action",
     },
   });
 
-  let voiceSetHtml = fs.readFileSync(
-    path.resolve(__dirname, "voice_set_action.html"),
-    { encoding: "utf-8" },
-  );
-  controller.sendMessageToRuntime({
-    id: "add-action",
+  controller.sendMessageToEditor({
+    type: "add-action",
     info: {
       actionId: 1,
       short: "xdiscvs",
-      name: "Discord_VoiceSet",
       displayName: "Voice Set",
       rendering: "standard",
       category: "discord",
@@ -121,47 +121,15 @@ exports.loadPackage = async function (gridController, persistedData) {
       hideIcon: false,
       type: "single",
       toggleable: true,
-      actionHtml: voiceSetHtml,
+      actionComponent: "voice-set-action",
     },
   });
 
-  let voiceToggleHtml = fs.readFileSync(
-    path.resolve(__dirname, "voice_toggle_action.html"),
-    { encoding: "utf-8" },
-  );
-  controller.sendMessageToRuntime({
-    id: "add-action",
+  controller.sendMessageToEditor({
+    type: "add-action",
     info: {
       actionId: 2,
-      short: "xdiscvt",
-      name: "Discord_VoiceToggle",
-      displayName: "Voice Toggle",
-      rendering: "standard",
-      category: "discord",
-      blockTitle: "Voice Toggle",
-      defaultLua: 'gps("package-discord", "mute-toggle")',
-      color: "#5865F2",
-      icon: discordIconSvg,
-      blockIcon: discordIconSvg,
-      selectable: true,
-      movable: true,
-      hideIcon: false,
-      type: "single",
-      toggleable: true,
-      actionHtml: voiceToggleHtml,
-    },
-  });
-
-  let selectChannelHtml = fs.readFileSync(
-    path.resolve(__dirname, "select_voice_channel_action.html"),
-    { encoding: "utf-8" },
-  );
-  controller.sendMessageToRuntime({
-    id: "add-action",
-    info: {
-      actionId: 3,
       short: "xdiscsc",
-      name: "Discord_ChannelSelect",
       displayName: "Channel Select",
       rendering: "standard",
       category: "discord",
@@ -175,7 +143,7 @@ exports.loadPackage = async function (gridController, persistedData) {
       hideIcon: false,
       type: "single",
       toggleable: true,
-      actionHtml: selectChannelHtml,
+      actionComponent: "select-voice-channel-action",
     },
   });
 
@@ -183,21 +151,17 @@ exports.loadPackage = async function (gridController, persistedData) {
 };
 
 exports.unloadPackage = async function () {
-  controller.sendMessageToRuntime({
-    id: "remove-action",
+  controller.sendMessageToEditor({
+    type: "remove-action",
     actionId: 0,
   });
-  controller.sendMessageToRuntime({
-    id: "remove-action",
+  controller.sendMessageToEditor({
+    type: "remove-action",
     actionId: 1,
   });
-  controller.sendMessageToRuntime({
-    id: "remove-action",
+  controller.sendMessageToEditor({
+    type: "remove-action",
     actionId: 2,
-  });
-  controller.sendMessageToRuntime({
-    id: "remove-action",
-    actionId: 3,
   });
   controller = undefined;
   messagePorts.forEach((port) => port.close());
