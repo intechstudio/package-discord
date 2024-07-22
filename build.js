@@ -19,7 +19,9 @@ for (const file of files) {
     fs.renameSync(file, `${subfolder}/${file}`);
   }
 }
+
 //Copy components dist folder
+fs.mkdirSync(`${subfolder}/components`);
 fs.renameSync("compoments/dist", `${subfolder}/components/dist`);
 
 output.on("close", () => {
