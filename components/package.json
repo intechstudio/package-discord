@@ -15,6 +15,6 @@
     "vite": "^5.3.1"
   },
   "dependencies": {
-    "@intechstudio/grid-uikit": "^1.20240715.813"
+    "@intechstudio/grid-uikit": "^1.20240722.817"
   }
 }
