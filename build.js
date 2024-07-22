@@ -9,7 +9,14 @@ if (!fs.existsSync(subfolder)) {
   fs.mkdirSync(subfolder);
 }
 
-const excludedFiles = [subfolder, "components", "archive.js", "build.js", ".github", ".git"];
+const excludedFiles = [
+  subfolder,
+  "components",
+  "archive.js",
+  "build.js",
+  ".github",
+  ".git",
+];
 
 // Get all files and directories in the current folder
 const files = fs.readdirSync(".");
@@ -22,7 +29,7 @@ for (const file of files) {
 
 //Copy components dist folder
 fs.mkdirSync(`${subfolder}/components`);
-fs.renameSync("compoments/dist", `${subfolder}/components/dist`);
+fs.renameSync("components/dist", `${subfolder}/components/dist`);
 
 output.on("close", () => {
   console.log("Archive created successfully.");
