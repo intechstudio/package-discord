@@ -16,6 +16,7 @@
   "dependencies": {
     "@xhayper/discord-rpc": "^1.1.2",
     "archiver": "^7.0.1",
-    "patch-package": "^8.0.0"
+    "patch-package": "^8.0.0",
+    "ws": "^8.18.0"
   }
 }
