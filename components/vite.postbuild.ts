@@ -20,7 +20,7 @@ export function notifyEditorAfterBuildPlugin(): PluginOption {
               event: "components-build-complete",
               id: "package-discord",
               rootPath: path.resolve(__dirname, ".."),
-            })
+            }),
           );
           ws.close();
           clearTimeout(timeout);

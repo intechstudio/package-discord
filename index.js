@@ -9,6 +9,9 @@ const { Client } = require("@xhayper/discord-rpc");
 let client;
 let clientId;
 let clientSecret;
+let clientStatus = "authorize";
+
+let preferencePort = undefined;
 
 function initializeDiscord(
   newClientId,
@@ -28,6 +31,7 @@ function initializeDiscord(
     redirect_uri,
   });
 
+  console.log({ refreshToken });
   client
     .login({ scopes, refreshToken })
     .then(async () => {
@@ -43,20 +47,12 @@ function initializeDiscord(
       client.subscribe("VOICE_SETTINGS_UPDATE");
       const settings = await client.user.getVoiceSettings();
       handleVoiceSettingsChange(settings);
-      messagePorts.forEach((port) => {
-        port.postMessage({
-          type: "echo",
-          message: "Discord connected",
-        });
-      });
+      clientStatus = "connected";
+      notifyListeners();
     })
     .catch((error) => {
-      messagePorts.forEach((port) => {
-        port.postMessage({
-          type: "echo",
-          message: "Discord connection failed" + error,
-        });
-      });
+      clientStatus = "error";
+      notifyListeners();
     });
 }
 
@@ -168,24 +164,22 @@ exports.unloadPackage = async function () {
   messagePorts.clear();
 };
 
-exports.addMessagePort = async function (port) {
+exports.addMessagePort = async function (port, senderId) {
   port.on("message", (e) => {
     onMessage(port, e.data);
   });
-
   messagePorts.add(port);
-  if (clientId && clientSecret) {
-    port.postMessage({
-      type: "clientInit",
-      message: {
-        clientId,
-        clientSecret,
-      },
-    });
-  }
   port.on("close", () => {
     messagePorts.delete(port);
   });
+  if (senderId == "preference") {
+    if (preferencePort) {
+      preferencePort.close();
+      messagePorts.delete(preferencePort);
+    }
+    preferencePort = port;
+    notifyListeners();
+  }
   port.start();
 };
 
@@ -253,31 +247,18 @@ exports.sendMessage = async function (args) {
 };
 
 async function onMessage(port, data) {
-  if (data.type === "request-echo") {
-    port.postMessage({
-      type: "echo",
-      message: "Echo message",
-    });
-  }
   if (data.type === "auth_discord") {
     initializeDiscord(data.clientId, data.clientSecret);
   }
-  if (data.type === "mic_volume") {
-    let vol = Number(data.volume);
-    // vol must be between 0 and 100
-    if (vol > 100) vol = 100;
-    if (vol < 0) vol = 0;
-    client.user
-      .setVoiceSettings({ input: { volume: vol } })
-      .catch(console.info);
-  }
-  if (data.type === "out_volume") {
-    let vol = Number(data.volume);
-    if (vol > 100) vol = 100;
-    if (vol < 0) vol = 0;
-    // vol must be between 0 and 100
-    client.user
-      .setVoiceSettings({ output: { volume: vol } })
-      .catch(console.info);
-  }
+}
+
+function notifyListeners() {
+  preferencePort?.postMessage({
+    type: "clientInit",
+    message: {
+      clientId,
+      clientSecret,
+      clientStatus,
+    },
+  });
 }
