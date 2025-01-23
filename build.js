@@ -13,6 +13,7 @@ const excludedFiles = [
   subfolder,
   "components",
   "archive.js",
+  "guide",
   "build.js",
   ".github",
   ".git",

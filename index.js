@@ -30,8 +30,14 @@ function initializeDiscord(
     clientSecret,
     redirect_uri,
   });
+  controller?.sendMessageToEditor({
+    type: "persist-data",
+    data: {
+      "client-id": clientId,
+      "client-secret": clientSecret,
+    },
+  });
 
-  console.log({ refreshToken });
   client
     .login({ scopes, refreshToken })
     .then(async () => {
@@ -45,12 +51,11 @@ function initializeDiscord(
       });
       client.on("VOICE_SETTINGS_UPDATE", handleVoiceSettingsChange);
       client.subscribe("VOICE_SETTINGS_UPDATE");
-      const settings = await client.user.getVoiceSettings();
-      handleVoiceSettingsChange(settings);
       clientStatus = "connected";
       notifyListeners();
     })
     .catch((error) => {
+      console.error(error);
       clientStatus = "error";
       notifyListeners();
     });
@@ -165,9 +170,6 @@ exports.unloadPackage = async function () {
 };
 
 exports.addMessagePort = async function (port, senderId) {
-  port.on("message", (e) => {
-    onMessage(port, e.data);
-  });
   messagePorts.add(port);
   port.on("close", () => {
     messagePorts.delete(port);
@@ -178,7 +180,11 @@ exports.addMessagePort = async function (port, senderId) {
       messagePorts.delete(preferencePort);
     }
     preferencePort = port;
+    preferencePort.on("message", (e) => onPreferenceMessage(e.data));
     notifyListeners();
+  }
+  if (senderId == "voice-channel-action") {
+    port.on("message", (e) => onVoiceChannelActionMessage(port, e.data));
   }
   port.start();
 };
@@ -197,7 +203,7 @@ exports.sendMessage = async function (args) {
     }
     client.user
       .setVoiceSettings({ input: { volume: Math.min(transformedVol, 100) } })
-      .catch(console.info);
+      .catch(console.error);
   }
   if (type === "output") {
     let vol = Number(args[1]);
@@ -214,14 +220,14 @@ exports.sendMessage = async function (args) {
     }
     client.user
       .setVoiceSettings({ output: { volume: Math.min(transformedVol, 200) } })
-      .catch(console.info);
+      .catch(console.error);
   }
   if (type.includes("mute") || type.includes("deafen")) {
     let newValue = false;
     if (type.includes("toggle")) {
       let voiceSetting = await client.user
         .getVoiceSettings()
-        .catch(console.info);
+        .catch(console.error);
       if (type.includes("mute")) {
         newValue = !voiceSetting.mute;
       } else {
@@ -232,9 +238,9 @@ exports.sendMessage = async function (args) {
     }
 
     if (type.includes("mute")) {
-      client.user.setVoiceSettings({ mute: newValue }).catch(console.info);
+      client.user.setVoiceSettings({ mute: newValue }).catch(console.error);
     } else {
-      client.user.setVoiceSettings({ deaf: newValue }).catch(console.info);
+      client.user.setVoiceSettings({ deaf: newValue }).catch(console.error);
     }
   }
   if (type === "select-channel") {
@@ -242,11 +248,29 @@ exports.sendMessage = async function (args) {
     let force = Boolean(args[2]);
     client.user
       .selectVoiceChannel(channelId, undefined, force)
-      .catch(console.info);
+      .catch(console.error);
   }
 };
 
-async function onMessage(port, data) {
+async function onVoiceChannelActionMessage(port, data) {
+  if (data.type === "request-voice-channel-id") {
+    let channel = await client.user.getSelectedVoiceChannel();
+    port.postMessage({
+      type: "channel-id",
+      channelId: channel?.id,
+    });
+  }
+  if (data.type === "request-voice-channel-name") {
+    let channel = await client.user.fetchChannel(data.channelId);
+    port.postMessage({
+      type: "channel-name",
+      channelId: channel?.id,
+      channelName: channel?.name,
+    });
+  }
+}
+
+async function onPreferenceMessage(data) {
   if (data.type === "auth_discord") {
     initializeDiscord(data.clientId, data.clientSecret);
   }

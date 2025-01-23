@@ -1,23 +1,29 @@
 <svelte:options customElement={{tag: 'select-voice-channel-action', shadow: 'none'}} />
 <script>
-  import { AtomicInput, AtomicSuggestions } from "@intechstudio/grid-uikit";
-    import { onMount } from "svelte";
+  import { MeltCombo, MeltCheckbox } from "@intechstudio/grid-uikit";
+  import { onMount } from "svelte";
   let channelId = "";
   let forceSelect = false;
   let currentCodeValue = "";
   let ref;
-  let suggestionElement;
+  
+  let isConfigured = false;
+  let channelSuggestion = [];
+  
+  // @ts-ignore
+  const messagePort = createPackageMessagePort("package-discord", "voice-channel-action");
 
   function handleConfigUpdate(config) {
     const regex =
         /^gps\("package-discord", "select-channel", "*(.*?)"*, (.*?)\)$/;
     if (currentCodeValue != config.script){
-        currentCodeValue = config.script;
-        const match = config.script.match(regex);
-        if (match) {
-            channelId = match[1] ?? "null";
-            forceSelect = match[2];
-        }
+      currentCodeValue = config.script;
+      const match = config.script.match(regex);
+      if (match) {
+        channelId = match[1] ?? "null";
+        forceSelect = match[2];
+        isConfigured = true;
+      }
     }
   }
 
@@ -27,20 +33,48 @@
         detail: { handler: handleConfigUpdate },
     });
     ref.dispatchEvent(event);
+    messagePort.onmessage = (e) => {
+      const data = e.data;
+      if (data.type === "channel-id") {
+        channelId = data.channelId ?? "null";
+      }
+      if (data.type === "channel-name") {
+        if (data.channelName && data.channelId == channelId){
+          channelSuggestion = [
+            {info: data.channelName, value: data.channelId},
+          ]
+        }
+      }
+    };
+    messagePort.start();
   });
 
-  $: channelId, forceSelect, function() {
+  $: forceSelect, channelId !== "-1" && isConfigured && function() {
     var code = `gps("package-discord", "select-channel", ${channelId == "null" ? null : `"${channelId}"`}, ${forceSelect})`;
     if (currentCodeValue != code){
-        currentCodeValue = code;    
-        const event = new CustomEvent("updateCode", {
-            bubbles: true,
-            detail: { script: String(code) },
-        });
-        if (ref){
-            ref.dispatchEvent(event);
-        }
+      currentCodeValue = code;    
+      const event = new CustomEvent("updateCode", {
+        bubbles: true,
+        detail: { script: String(code) },
+      });
+      if (ref){
+        ref.dispatchEvent(event);
+      }
     }
+  }()
+
+  $: channelId === "-1" && function(){
+    messagePort.postMessage({
+      type: "request-voice-channel-id"
+    });
+  }()
+
+  $: (channelId ?? "").length > 5 && function(){
+    channelSuggestion = [];
+    messagePort.postMessage({
+      type: "request-voice-channel-name",
+      channelId,
+    });
   }()
 </script>
 
@@ -48,22 +82,22 @@
   class="{$$props.class} flex flex-col w-full pb-2 px-2 pointer-events-auto"
   bind:this={ref}
 >
-    <div class="w-full flex">
-        <div class="atomicInput" style="width: 80%;">
-            <div class="text-gray-500 text-sm pb-1">Channel ID</div>
-            <AtomicInput
-                inputValue={channelId}
-                suggestions={[{info: "Leave channel", value : "null"}]}
-                suggestionTarget={suggestionElement}
-                on:change={(e) => {
-                    channelId = e.detail;
-                }}/>
-        </div>
-        <div style="width: 20%;">
-            <div class="text-gray-500 text-sm pb-1">Force</div>
-            <input type="checkbox" bind:checked={forceSelect}/>
-        </div>
+  <div class="w-full flex">
+    <div class="grow">
+      <MeltCombo
+        bind:value={channelId}
+        title="Channel ID"
+        suggestions={[
+          {info: "Leave channel", value : "null"},
+          {info: "Get current channel", value : "-1"},
+          ...channelSuggestion,
+        ]} />
     </div>
-
-    <AtomicSuggestions bind:component={suggestionElement} />
+    <div class="pl-2">
+      <MeltCheckbox
+        bind:target={forceSelect}
+        title="Force"
+        />
+    </div>
+  </div>
 </select-voice-channel>

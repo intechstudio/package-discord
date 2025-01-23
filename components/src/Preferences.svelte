@@ -63,7 +63,7 @@
             <ol class="text-white pt-2" style="list-style: decimal;">
               <li>
                 <MoltenPushButton 
-                  text={"Open Discord"}
+                  text={"Create Discord App"}
                   click={() => window.open("https://discord.com/login?redirect_to=%2Fdevelopers%2Fapplications%3Fnew_application%3Dtrue")}
                 />
               </li>
@@ -71,7 +71,7 @@
                 <a
                 target="_blank"
                 class="pb-2 text-blue-500 hover:text-white"
-                href="https://google.com"
+                href="https://github.com/intechstudio/package-discord/blob/main/guide/app_guide.md"
                 >Follow the guide to create an app</a>
               </li>
             </ol>
