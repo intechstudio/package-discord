@@ -78,7 +78,7 @@ exports.loadPackage = async function (gridController, persistedData) {
   }
 
   let discordIconSvg = fs.readFileSync(
-    path.resolve(__dirname, "discord-mark-white.svg"),
+    path.resolve(__dirname, "discord-logo-black.svg"),
     { encoding: "utf-8" },
   );
 
