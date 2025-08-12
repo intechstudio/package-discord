@@ -66,7 +66,7 @@
           title="Target action" />
     </div>
     {#if targetType?.includes("set") ?? true}
-      <div class="pl-2" style="width: 55%;">
+      <div class="ml-2" style="width: 50%;">
         <MeltCombo
             bind:value={inputValue}
             title="Value" />

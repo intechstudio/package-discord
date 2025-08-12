@@ -93,7 +93,7 @@
           ...channelSuggestion,
         ]} />
     </div>
-    <div class="pl-2">
+    <div class="ml-2">
       <MeltCheckbox
         bind:target={forceSelect}
         title="Force"
