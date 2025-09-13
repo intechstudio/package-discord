@@ -2,6 +2,9 @@
 
 This package is a POC for controlling the Discord client. In order to make it work, you have to create an app and copy the oath2 `clientId` and `clientSecret` values into the package. In this package right now the *input* and *output* are controlled.
 
+> [!NOTE]  
+> Usage guide is [found here](/guide/app_guide.md).
+
 ## Overview
 
 Packages for the Grid Editor generally consists of two parts:
